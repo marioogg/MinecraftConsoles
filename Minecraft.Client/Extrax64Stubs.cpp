@@ -21,6 +21,7 @@
 #include "Windows64\Social\SocialManager.h"
 #include "Windows64\Sentient\DynamicConfigurations.h"
 #include "Windows64\Network\WinsockNetLayer.h"
+#include "Windows64\Windows64_NameXuid.h"
 #elif defined __PSVITA__
 #include "PSVita\Sentient\SentientManager.h"
 #include "StatsCounter.h"
@@ -285,7 +286,19 @@ IQNetPlayer* IQNet::GetPlayerByXuid(PlayerUID xuid)
 {
 	for (DWORD i = 0; i < s_playerCount; i++)
 	{
-		if (Win64_IsActivePlayer(&m_player[i], i) && m_player[i].GetXuid() == xuid) return &m_player[i];
+		// Conventional XUID implementation except for Windows 64.
+		if (!Win64_IsActivePlayer(&m_player[i], i))
+			continue;
+
+		if (m_player[i].GetXuid() == xuid)
+			return &m_player[i];
+
+		// For Windows 64, NameBase XUID is used.
+#ifdef _WINDOWS64
+		PlayerUID nameXuid = Win64NameXuid::ResolvePersistentXuidFromName(m_player[i].GetGamertag());
+		if (nameXuid == xuid)
+			return &m_player[i];
+#endif
 	}
 	return &m_player[0];
 }

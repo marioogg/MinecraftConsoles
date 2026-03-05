@@ -16,6 +16,7 @@
 #include "..\Minecraft.World\ArrayWithLength.h"
 #include "..\Minecraft.World\net.minecraft.network.packet.h"
 #include "..\Minecraft.World\net.minecraft.network.h"
+#include "Windows64\Windows64_NameXuid.h"
 #include "..\Minecraft.World\Pos.h"
 #include "..\Minecraft.World\ProgressListener.h"
 #include "..\Minecraft.World\HellRandomLevelSource.h"
@@ -520,12 +521,13 @@ shared_ptr<ServerPlayer> PlayerList::getPlayerForLogin(PendingConnection *pendin
 	player->setOnlineXuid( onlineXuid ); // 4J Added
 #ifdef _WINDOWS64
 	{
+		PlayerUID persistentXuid = Win64NameXuid::ResolvePersistentXuidFromName(userName);
+		player->setXuid(persistentXuid);
+
 		INetworkPlayer* np = pendingConnection->connection->getSocket()->getPlayer();
 		if (np != NULL)
 		{
-			PlayerUID realXuid = np->GetUID();
-			player->setXuid(realXuid);
-			player->setOnlineXuid(realXuid);
+			player->setOnlineXuid(np->GetUID());
 		}
 	}
 #endif

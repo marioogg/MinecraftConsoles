@@ -52,6 +52,7 @@
 #include "..\Minecraft.World\net.minecraft.world.level.dimension.h"
 #include "..\Minecraft.World\net.minecraft.world.item.h"
 #include "..\Minecraft.World\Minecraft.World.h"
+#include "Windows64\Windows64_NameXuid.h"
 #include "ClientConnection.h"
 #include "..\Minecraft.World\HellRandomLevelSource.h"
 #include "..\Minecraft.World\net.minecraft.world.entity.animal.h"
@@ -1038,6 +1039,9 @@ shared_ptr<MultiplayerLocalPlayer> Minecraft::createExtraLocalPlayer(int idx, co
 		PlayerUID playerXUIDOnline = INVALID_XUID;
 		ProfileManager.GetXUID(idx,&playerXUIDOffline,false);
 		ProfileManager.GetXUID(idx,&playerXUIDOnline,true);
+#ifdef _WINDOWS64
+		playerXUIDOffline = Win64NameXuid::ResolvePersistentXuidFromName(localplayers[idx]->name);
+#endif
 		localplayers[idx]->setXuid(playerXUIDOffline);
 		localplayers[idx]->setOnlineXuid(playerXUIDOnline);
 		localplayers[idx]->setIsGuest(ProfileManager.IsGuest(idx));
@@ -4296,6 +4300,9 @@ void Minecraft::setLevel(MultiPlayerLevel *level, int message /*=-1*/, shared_pt
 				playerXUIDOnline.setForAdhoc();
 			}
 #endif
+#ifdef _WINDOWS64
+			playerXUIDOffline = Win64NameXuid::ResolvePersistentXuidFromName(player->name);
+#endif
 			player->setXuid(playerXUIDOffline);
 			player->setOnlineXuid(playerXUIDOnline);
 
@@ -4478,6 +4485,9 @@ void Minecraft::respawnPlayer(int iPad, int dimension, int newEntityId)
 	PlayerUID playerXUIDOnline = INVALID_XUID;
 	ProfileManager.GetXUID(iTempPad,&playerXUIDOffline,false);
 	ProfileManager.GetXUID(iTempPad,&playerXUIDOnline,true);
+#ifdef _WINDOWS64
+	playerXUIDOffline = Win64NameXuid::ResolvePersistentXuidFromName(player->name);
+#endif
 	player->setXuid(playerXUIDOffline);
 	player->setOnlineXuid(playerXUIDOnline);
 	player->setIsGuest( ProfileManager.IsGuest(iTempPad) );
